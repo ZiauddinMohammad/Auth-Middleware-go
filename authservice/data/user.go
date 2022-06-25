@@ -1,60 +1,65 @@
 package data
 
-type user struct {
-	fullname   string
-	email      string
-	username   string
-	password   string
-	createdate string
-	role       string
+//user struct
+type User struct {
+	Fullname   string
+	Email      string
+	Username   string
+	Password   string
+	Createdate string
+	Role       string
 }
 
-var users = []user{
+// user data
+var users = []User{
 	{
-		fullname:   "userone",
-		email:      "userone@abc.com",
-		username:   "user1",
-		password:   "pass1",
-		createdate: "1780506070",
-		role:       "admin",
+		Fullname:   "userone",
+		Email:      "userone@abc.com",
+		Username:   "user1",
+		Password:   "pass1",
+		Createdate: "1780506070",
+		Role:       "admin",
 	},
 	{
-		fullname:   "usertwo",
-		email:      "usertwo@abc.com",
-		username:   "user2",
-		password:   "pass2",
-		createdate: "1780506070",
-		role:       "user"},
+		Fullname:   "usertwo",
+		Email:      "usertwo@abc.com",
+		Username:   "user2",
+		Password:   "pass2",
+		Createdate: "1780506070",
+		Role:       "user"},
 }
 
 //returns a user object based on user email
-func GetUser(email string) (user, bool) {
+func GetUser(email string) (User, bool) {
+	//loop thru users data
 	for _, user := range users {
-		if user.email == email {
+		if user.Email == email {
 			return user, true
 		}
 	}
-	return user{}, false
+	return User{}, false
 }
 
 //validate password
-func (u *user) ValidatePassword(password string) bool {
-	return u.password == password
+func (u *User) ValidatePassword(password string) bool {
+	return u.Password == password
 }
 
 // Add user
 func AddUser(fullname string, email string, username string, password string, role string) bool {
-	user := user{
-		fullname: fullname,
-		email:    email,
-		username: username,
-		password: password,
-		role:     role,
-	}
+	//check if email or username already exists
 	for _, exist_user := range users {
-		if exist_user.email == user.email || exist_user.username == user.username {
+		if exist_user.Email == email || exist_user.Username == username {
 			return false
 		}
+	}
+	//Create and append new user to users data list
+	user := User{
+		Fullname: fullname,
+		Email:    email,
+		Username: username,
+		Password: password,
+		Role:     role,
 	}
 	users = append(users, user)
 	return true
