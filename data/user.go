@@ -1,5 +1,7 @@
 package data
 
+import "fmt"
+
 //user struct
 type User struct {
 	Fullname   string
@@ -20,7 +22,10 @@ type UserSearch struct {
 	Username string
 }
 
-const jwt_key = "my-super-secret-jwt-key"
+const JWT_key = "my-super-secret-jwt-key"
+
+// stores users tokens
+var users_tokens = make(map[string]string)
 
 // user data
 var users = []User{
@@ -85,4 +90,10 @@ func AddUser(fullname string, email string, username string, password string, ro
 	}
 	users = append(users, user)
 	return true
+}
+
+//Add generated jwt tokens to userbase
+func Addusertoken(username string, jwttoken string) {
+	users_tokens[username] = jwttoken
+	fmt.Println(users_tokens)
 }
