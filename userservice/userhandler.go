@@ -1,8 +1,11 @@
 package user_service
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/ziauddinmohammad/Auth-Middleware-go/data"
@@ -35,7 +38,17 @@ func GetUserProfile(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("not authorized to access"))
 		return
 	}
+
 	//check if user is requesting his profile or not
+	payload_byte, _ := base64.StdEncoding.DecodeString(strings.Split(token, ".")[1])
+	var payload_map map[string]string
+	json.Unmarshal(payload_byte, &payload_map)
+	if payload_map["username"] != username {
+		fmt.Println(payload_map[username], username)
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("not authorised to access " + username))
+		return
+	}
 
 	//get user profile
 	user_profile, exists := data.GetUser(user_search)
