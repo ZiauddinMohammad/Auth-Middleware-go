@@ -10,6 +10,18 @@ type User struct {
 	Role       string
 }
 
+type UserCredentials struct {
+	Email    string
+	Password string
+}
+
+type UserSearch struct {
+	Email    string
+	Username string
+}
+
+const jwt_key = "my-super-secret-jwt-key"
+
 // user data
 var users = []User{
 	{
@@ -30,14 +42,24 @@ var users = []User{
 }
 
 //returns a user object based on user email
-func GetUser(email string) (User, bool) {
+func GetUser(usersearch UserSearch) (User, bool) {
 	//loop thru users data
-	for _, user := range users {
-		if user.Email == email {
-			return user, true
+	if usersearch.Email != "" {
+		for _, user_profile := range users {
+			if user_profile.Email == usersearch.Email {
+				return user_profile, true
+			}
+		}
+	}
+	if usersearch.Username != "" {
+		for _, user_profile := range users {
+			if user_profile.Username == usersearch.Username {
+				return user_profile, true
+			}
 		}
 	}
 	return User{}, false
+
 }
 
 //validate password

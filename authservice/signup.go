@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ziauddinmohammad/Auth-Middleware-go/authservice/data"
+	"github.com/ziauddinmohammad/Auth-Middleware-go/data"
 )
 
 func Signuphandler(w http.ResponseWriter, r *http.Request) {
@@ -44,8 +44,9 @@ func Signuphandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("user added successfully"))
 		return
-	}
-	else{
-		
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Email already exists"))
+		return
 	}
 }
