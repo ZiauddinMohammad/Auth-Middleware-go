@@ -11,12 +11,16 @@ import (
 
 // JWT token string = header string . message string. signature string
 // signature string = sha256(header+message,secret)
-func GenerateJWTToken(header string, payload map[string]string, secret string) (string, error) {
+func GenerateJWTToken(header map[string]string, payload map[string]string, secret string) (string, error) {
 	//Create a hash using a crypto algorithm and a secret key
 	h := hmac.New(sha256.New, []byte(secret))
 
 	//Encode the header with base64
-	EncodedHeader := base64.StdEncoding.EncodeToString([]byte(header))
+	headerString, err := json.Marshal(header)
+	if err != nil {
+		return "", errors.New("header marshal error")
+	}
+	EncodedHeader := base64.StdEncoding.EncodeToString([]byte(headerString))
 
 	//Convert payload map to json string and then encode it to base64
 	payloadString, err := json.Marshal(payload)
@@ -28,7 +32,7 @@ func GenerateJWTToken(header string, payload map[string]string, secret string) (
 	//Now add Encoded header and encoded payload
 	message := EncodedHeader + "." + EncodedPayload
 
-	unsignedstr := header + string(payloadString)
+	unsignedstr := string(headerString) + string(payloadString)
 	//write this unsignedstr to SHA256 algorithm to hash it
 	h.Write([]byte(unsignedstr))
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/ziauddinmohammad/Auth-Middleware-go/authservice"
+	"github.com/ziauddinmohammad/Auth-Middleware-go/middleware"
 	user_service "github.com/ziauddinmohammad/Auth-Middleware-go/userservice"
 )
 
@@ -23,7 +24,7 @@ func main() {
 	auth_router.HandleFunc("/signin", authservice.Signinhandler).Methods("GET")
 
 	// Add routes for user router
-	user_router.HandleFunc("/{username}", user_service.GetUserProfile).Methods("GET")
+	user_router.HandleFunc("/{username}", middleware.IsAuthorized(user_service.GetUserProfile)).Methods("GET")
 
 	server := http.Server{
 		Addr:    ":8080",

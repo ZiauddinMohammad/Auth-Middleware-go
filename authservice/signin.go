@@ -38,7 +38,10 @@ func Signinhandler(w http.ResponseWriter, r *http.Request) {
 		if saved_user.Password == received_credentials.Password {
 
 			// Generate token and save it
-			header := "H256"
+			header := map[string]string{
+				"alg": "HS256",
+				"typ": "JWT",
+			}
 			payload := map[string]string{
 				"username":   saved_user.Username,
 				"expires at": fmt.Sprint(time.Now().Add(5 * time.Minute).Unix()),

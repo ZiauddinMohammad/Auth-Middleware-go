@@ -94,6 +94,15 @@ func AddUser(fullname string, email string, username string, password string, ro
 
 //Add generated jwt tokens to userbase
 func Addusertoken(username string, jwttoken string) {
-	users_tokens[username] = jwttoken
+	users_tokens[jwttoken] = username
 	fmt.Println(users_tokens)
+}
+
+//Validate user sent token in token base
+func IsTokenExists(token string) (string, bool) {
+	username, exists := users_tokens[token]
+	if !exists {
+		return "", false
+	}
+	return username, true
 }

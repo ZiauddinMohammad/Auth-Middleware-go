@@ -1,15 +1,13 @@
 package user_service
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/ziauddinmohammad/Auth-Middleware-go/data"
-	"github.com/ziauddinmohammad/Auth-Middleware-go/jwt"
+	"github.com/ziauddinmohammad/Auth-Middleware-go/utils"
 )
 
 func GetUserProfile(w http.ResponseWriter, r *http.Request) {
@@ -19,30 +17,15 @@ func GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	var user_search data.UserSearch
 	user_search.Username = username
 
-	//Check if user is authenticated or not
-	var token string
-	err := json.NewDecoder(r.Body).Decode(&token)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("error while decoding token"))
-		return
-	}
-	valid, err := jwt.ValidateToken(token, data.JWT_key)
+	token, err := utils.ParseToken(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
 	}
-	if !valid {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("not authorized to access"))
-		return
-	}
 
+	payload_map, _ := utils.ParsePayloadFromToken(token)
 	//check if user is requesting his profile or not
-	payload_byte, _ := base64.StdEncoding.DecodeString(strings.Split(token, ".")[1])
-	var payload_map map[string]string
-	json.Unmarshal(payload_byte, &payload_map)
 	if payload_map["username"] != username {
 		fmt.Println(payload_map[username], username)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -54,13 +37,13 @@ func GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	user_profile, exists := data.GetUser(user_search)
 	if exists {
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
 		err := json.NewEncoder(w).Encode(user_profile)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("Error decoding user profile"))
 			return
 		}
-		w.WriteHeader(http.StatusOK)
 		return
 
 	} else {
